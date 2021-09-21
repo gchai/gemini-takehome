@@ -1,14 +1,4 @@
-# Tested with Python 3.7 and 3.9
-# Please use pytest to run.
-
-# There are currently 34 tests
-# Some tests are currently failing
-# There's some edge case issues where BTCUSD does not work. (Stop limit for BTCUSD didn't work earlier, but it works now
-# Indication of Interest fails no matter what you throw at it, it seems to be deprecated but the API documentation still shows it
-# Auction fails if its outside of auction hours. I noted a workaround below
-#     either change the expectation with the current time, or only run the test during auction hours.
-#     Depends on business needs
-
+# Gabe Chai's Submission for the Gemini API take home assignment
 
 import jsonschema
 import requests
@@ -17,8 +7,8 @@ import base64
 import hmac
 import hashlib
 import datetime, time
-from jsonschema import validate
 import pytest
+from jsonschema import validate
 
 base_url = "https://api.sandbox.gemini.com"
 endpoint = "/v1/order/new"
