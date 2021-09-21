@@ -9,7 +9,6 @@ import hmac
 import hashlib
 import datetime, time
 from jsonschema import validate
-import logging
 import pytest
 
 base_url = "https://api.sandbox.gemini.com"
