@@ -1,0 +1,126 @@
+{
+    "title": "Gemini new order API",
+    "description": "https://docs.gemini.com/rest-api/#new-order",
+    "type": "object",
+    "properties":
+    {
+        "order_id":
+        {
+            "description": "The order id",
+            "type": "string"
+        },
+        "symbol":
+        {
+            "description": "The symbol of the order",
+            "type": "string"
+        },
+        "exchange":
+        {
+            "description": "Will always be 'gemini'",
+            "const": "gemini"
+        },
+        "price":
+        {
+            "description": "The price the order was issued at",
+            "type": "string",
+            "pattern": "^[0-9]+(\\.[0-9][0-9])?$"
+        },
+        "avg_execution_price":
+        {
+            "description": "The average price at which this order as been executed so far. 0 if the order has not been executed at all.",
+            "type": "string",
+            "pattern": "^[0-9]+(\\.[0-9]+)?$"
+        },
+        "side":
+        {
+            "description": "Either 'buy' or 'sell'.",
+            "enum":
+            [
+                "buy",
+                "sell"
+            ]
+        },
+        "type":
+        {
+            "description": "Description of the order: exchange limit, auction-only exchange limit, market buy, market sell, indication-of-interest",
+            "enum":
+            [
+                "exchange limit",
+                "auction-only exchange limit",
+                "market buy",
+                "market sell",
+                "indication-of-interest"
+            ]
+        },
+        "options":
+        {
+            "description": "An array containing at most one supported order execution option.",
+            "type": "array"
+        },
+        "timestamp":
+        {
+            "description": "The timestamp the order was submitted. Note that for compatibility reasons, this is returned as a string. We recommend using the timestampms field instead.",
+            "type": "string",
+            "pattern": "^[0-9]+$"
+        },
+        "timestampms":
+        {
+            "description": "The timestamp the order was submitted in milliseconds.",
+            "type": "integer"
+        },
+        "is_live":
+        {
+            "description": "true if the order is active on the book (has remaining quantity and has not been canceled)",
+            "type": "boolean"
+        },
+        "is_cancelled":
+        {
+            "description": "true if the order has been canceled. Note the spelling, 'cancelled' instead of 'canceled'. This is for compatibility reasons.",
+            "type": "boolean"
+        },
+        "reason":
+        {
+            "description": "Populated with the reason your order was canceled, if available.",
+            "type": "string"
+        },
+        "was_forced":
+        {
+            "description": "Will always be false.",
+            "type": "boolean"
+        },
+        "executed_amount":
+        {
+            "description": "The amount of the order that has been filled.",
+            "type": "string"
+        },
+        "remaining_amount":
+        {
+            "description": "The amount of the order that has not been filled.",
+            "type": "string"
+        },
+        "original_amount":
+        {
+            "description": "The originally submitted amount of the order.",
+            "type": "string"
+        }
+    },
+    "required":
+    [
+        "order_id",
+        "symbol",
+        "exchange",
+        "price",
+        "avg_execution_price",
+        "side",
+        "type",
+        "options",
+        "timestamp",
+        "timestampms",
+        "is_live",
+        "is_cancelled",
+        "was_forced",
+        "executed_amount",
+        "remaining_amount",
+        "original_amount"
+    ]
+}

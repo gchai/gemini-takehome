@@ -1,0 +1,23 @@
+{
+    "title": "Gemini new order API",
+    "description": "https://docs.gemini.com/rest-api/#new-order",
+    "type": "object",
+    "properties":
+    {
+        "result":
+        {
+            "description": "Result of request",
+            "type": "string"
+        },
+        "reason":
+        {
+            "description": "Reason for error",
+            "type": "string"
+        },
+        "message":
+        {
+            "description": "Error Message",
+            "type": "string"
+        }
+    }
+}
