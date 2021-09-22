@@ -1,6 +1,15 @@
 # Tested with Python 3.7 and 3.9
 # Please use pytest to run.
 
+# There are currently 34 tests
+# Some tests are currently failing
+# There's some edge case issues where BTCUSD does not work. (Stop limit for BTCUSD didn't work earlier, but it works now
+# Indication of Interest fails no matter what you throw at it, it seems to be deprecated but the API documentation still shows it
+# Auction fails if its outside of auction hours. I noted a workaround below
+#     either change the expectation with the current time, or only run the test during auction hours.
+#     Depends on business needs
+
+
 import jsonschema
 import requests
 import json
@@ -153,7 +162,30 @@ def test_basic_happypath_tests(
 @pytest.mark.parametrize(
     "test_reason, payload_symbol, payload_amount, payload_price, payload_side, payload_type",
     {
-        ("InvalidPrice", "btcusd", "5", "3633.002", "buy", "exchange limit"),
+        (
+            "InvalidPrice",
+            "btcusd",
+            "5",
+            "3633.002",
+            "buy",
+            "exchange limit",
+        ),  # >2 decimals for price
+        (
+            "InvalidPrice",
+            "btcusd",
+            "5",
+            "-3633.00",
+            "buy",
+            "exchange limit",
+        ),  # negatice price
+        (
+            "InvalidPrice",
+            "btcusd",
+            "5",
+            "notint",
+            "buy",
+            "exchange limit",
+        ),  # Not a float price
         (
             "InvalidQuantity",
             "btcusd",
@@ -211,10 +243,21 @@ def test_basic_negative_tests(
 @pytest.mark.parametrize(
     "test_name, payload_symbol, payload_amount, payload_price, payload_side, payload_type, payload_stop_price, schema, resp_code",
     [
-        # For some reason, BTC Stop limit BUY is bugged,
+        # For some reason, BTC Stop limit BUY was bugged when I initially tested it,
         # it will always return "Invalid price for symbol BTCUSD: 43633.00" for whatever reason
         # I have tried to set it to different numbers, but it doesn't work. Other currencies and BTCUSD SELL work.
-        # ("BTC Stop Limit", "btcusd", "5", "43633.15", "buy", "exchange stop limit", "43600.00", order_status_schema, 200),
+        # Note from later, this works now
+        (
+            "BTC Stop Limit",
+            "btcusd",
+            "5",
+            "43633.15",
+            "buy",
+            "exchange stop limit",
+            "43600.00",
+            order_status_schema,
+            200,
+        ),
         (
             "BTCUSD Sell Stop Limit",
             "btcusd",
@@ -323,7 +366,9 @@ def test_stop_limit(
     new_order, status_code = call_api(payload)
     print(new_order)
 
-    assert status_code == resp_code, f"Status code should be {resp_code}, its {status_code}"
+    assert (
+        status_code == resp_code
+    ), f"Status code should be {resp_code}, its {status_code}"
     assert validate_json(new_order, schema)
     if resp_code == 200:
         assert (
@@ -426,13 +471,31 @@ def test_bad_nonce():
             ["immediate-or-cancel"],
             200,
         ),
-        ("Fill or Kill", "btcusd", "5", "3633.00", "buy", "exchange limit", ["fill-or-kill"], 200),
+        (
+            "Fill or Kill",
+            "btcusd",
+            "5",
+            "3633.00",
+            "buy",
+            "exchange limit",
+            ["fill-or-kill"],
+            200,
+        ),
         # Auction tests can only run on certain times of the day.
         # Couple ways we can handle this.
         # Only run it during the hours that it's expected to run?
         # Program in a function that checks the time and
         #     if it's outside of normal hours we can expect a 400, otherwise a 200.
-        ("Auction Test", "btcusd", "5", "3633.00", "buy", "exchange limit", ["auction-only"], 200),
+        (
+            "Auction Test",
+            "btcusd",
+            "5",
+            "3633.00",
+            "buy",
+            "exchange limit",
+            ["auction-only"],
+            200,
+        ),
         # Indication of interest runs into the same issue as before where btcusd has some bug that causes an invalid price error.
         # Interestingly, the API response to multiple options seems to infer that "Indication if Interest" is no longer supported
         # it states: A single order supports at most one of these options: ['maker-or-cancel', 'immediate-or-cancel', 'auction-only', 'fill-or-kill']
@@ -486,7 +549,9 @@ def test_order_options(
     new_order, status_code = call_api(payload)
     print(new_order)
 
-    assert status_code == resp_code, f"Status code should be {resp_code}, its {status_code}"
+    assert (
+        status_code == resp_code
+    ), f"Status code should be {resp_code}, its {status_code}"
     assert validate_json(new_order, order_status_schema)
 
     if resp_code == 200:
